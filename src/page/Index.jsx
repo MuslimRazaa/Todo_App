@@ -5,16 +5,17 @@ function Index() {
     const [task , setTask] = useState(todos);
     const [newTask , setNewTask] = useState("");
     const [edit , setEdit] = useState(false);
+    const [editTask , setEditTask] = useState(false);
 
 
 
     const handleInput = (e) =>{
         setNewTask(e.target.value)
     }
-
     const addTask =() =>{
         if(newTask.trim() !== ""){
-            setTask([...task , newTask])
+            setTask([...task , {name: newTask}])
+            setNewTask("")
         }
     }
 
@@ -24,16 +25,23 @@ function Index() {
         updatedTask.splice(ind, 1);
         setTask(updatedTask)
     }
-    const updateTask = () =>{
+    const updateTask = (e) =>{
+
+        setTask(
+            task.map((t)=>
+                t === editTask ? {...t, name: newTask} : t
+            )
+        )
+
+
         setEdit(false)
-
+        setNewTask("")
     }
 
-    const handleEdit= () =>{
+    const handleEdit= (task) =>{
         setEdit(true)
-    }
-    const handleEditChange= () =>{
-
+        setEditTask(task)
+        setNewTask(task.name)
     }
   return (
     <div className='todo-main'>
@@ -41,32 +49,22 @@ function Index() {
             <h1>Todo App</h1>
         </div>
         <div className='todo-form'>
-            {edit ? 
-            (<input 
+            <input 
                 type='text'
-                placeholder='Edit task here...'
-                value={newTask}
-                onChange={handleEditChange}
-            />)
-            :
-            (<input 
-                type='text'
-                placeholder='Enter task here...'
+                placeholder="Enter Task here"
                 value={newTask}
                 onChange={handleInput}
-            />)
-
-             }
+            />
 
             {edit ? 
-            (<button onClick={updateTask}>Update task</button>) :
-            (<button onClick={addTask}>Add task</button>)  
+            (<button onClick={updateTask} className='update-btn'>Update task</button>) :
+            (<button onClick={addTask} className='add-btn'>Add task</button>)  
             }
         </div>
         {task.map((task, index) => (
-        <div key= {index} className='todo-list'>
+        <div key= {task.index} className='todo-list'>
             <ul>
-                <li>{task.name}</li> <button onClick={()=> deleteTask(index)}>Delete Task</button><button onClick={handleEdit}>Edit</button>
+                <li>{task.name}</li> <button onClick={()=> deleteTask(index)} className='dlt-btn'>Delete Task</button><button className='edit-btn' onClick={() => handleEdit(task)}>Edit</button>
             </ul>
         </div>
         ))}
